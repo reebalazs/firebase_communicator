@@ -2,11 +2,12 @@
   tal:define="auth_token python: view.auth_token;"
   tal:attributes="ng-init string:firebaseUrl = '${view/config/firebase_url}';;
                   authToken = '${auth_token}';;
-                  serverId = '${view/config/server_id}';;
+                  serverId = '${view/auth_data/server_id}';;
                   userId='${view/auth_data/user_id}';;
                   fullName='${view/auth_data/full_name}';;
-                  fullName='${view/auth_data/portrait_url}';;
+                  portraitUrl='${view/auth_data/portrait_url}';;
                   staticRoot='${view/static/root}';;
+                  isAdmin='${view/auth_data/is_admin}';;
                   ">
   <div class="close fb-close"></div>
   <div class="fb-overlay-content">

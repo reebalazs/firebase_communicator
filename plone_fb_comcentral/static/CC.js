@@ -92,6 +92,7 @@ app.service('AuthService', ['$rootScope', 'angularFire', '$q', '$cookieStore',
         // constants for testing.
         $rootScope.staticRoot = '../static';
         $rootScope.authToken = '';
+        $rootScope.isAdmin = false;
 
         // Fetch options. Currently only firebaseUrl is settable here.
         $.getJSON($rootScope.staticRoot + 'options.json', function (data) {
@@ -109,18 +110,17 @@ app.service('AuthService', ['$rootScope', 'angularFire', '$q', '$cookieStore',
             $rootScope.fullName = userCreds.fullName;
         }
 
+
     } else {
-
         // Real mode.
+        $rootScope.isAdmin = $rootScope.isAdmin == 'true' || $rootScope.isAdmin == 'True';
         optionsQ.resolve();
-        $rootScope.staticRoot = $('meta[name="fb-comcentral-static"]').attr('content');
-
     }
 
-    $rootScope.defaultPortrait = staticRoot + 'defaultPortrait.png';
+    $rootScope.defaultPortrait = $rootScope.staticRoot + 'defaultPortrait.png';
     // Make user username and server id only contains good characters.
     var regExp = new RegExp('[a-zA-Z0-9.-_]+$');
-    if ($rootScope.serverId.search(regExp) === 0 && $rootScope.userId.search(regExp) === 0) {
+    if ($rootScope.serverId.search(regExp) !== 0 || $rootScope.userId.search(regExp) !== 0) {
         throw new Error('Server id and user id may only contain alphanumeric and _ - ');
     }
 

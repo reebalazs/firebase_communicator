@@ -11,6 +11,7 @@ class FirebaseViewlet(base.ViewletBase):
 
     def update(self):
         super(FirebaseViewlet, self).update()
+
         auth_info = get_auth_info(self.context, self.request)
         self.auth_token = auth_info['auth_token']
         self.auth_data = auth_info['auth_data']

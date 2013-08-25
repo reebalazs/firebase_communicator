@@ -7,8 +7,6 @@ from Products.Five import BrowserView
 
 from .config import (
     get_config,
-    get_properties,
-    get_env_config,
 )
 
 
@@ -28,10 +26,15 @@ def get_user_data(context, request):
     if portrait_url.endswith('/defaultUser.png'):
         # default portrait: return empty string, meaning no portrait.
         portrait_url = ''
+
+    # XXX TODO set this based on permission
+    is_admin = user_id == 'admin'
+
     return dict(
         user_id=user_id,
         full_name=full_name,
         portrait_url=portrait_url,
+        is_admin=is_admin,
     )
 
     # XXX XXX filter_users is currently not used.
@@ -52,25 +55,29 @@ def get_allowed_userid(context, request):
     return get_user_data(context, request)['user_id']
 
 
-def get_auth_info(context, request, admin=False):
-    if not admin:
+def get_auth_info(context, request, force_admin=False):
+    if not force_admin:
         user_data = get_user_data(context, request)
     else:
         user_data = dict(
             user_id='admin',
             full_name='',
             portrait_url='',
+            is_admin=True,
         )
 
+    config = get_config()
+
     custom_data = {
+        'server_id': config['server_id'],
         'user_id': user_data['user_id'],
         'full_name': user_data['full_name'],
         'portrait_url': user_data['portrait_url'],
+        'is_admin': user_data['is_admin'],
     }
     options = {
-        'admin': admin,
+        'admin': user_data['is_admin'],
     }
-    config = get_config()
 
     if user_data['user_id'] is not None and user_data['user_id'] is not False:
         token = create_token(config['firebase_secret'], custom_data, options)
@@ -95,8 +102,8 @@ def get_auth_info(context, request, admin=False):
     )
 
 
-def get_auth_token(context, request, admin=False):
-    get_auth_info(context, request, admin=False)['auth_token']
+def get_auth_token(context, request, force_admin=False):
+    get_auth_info(context, request, force_admin=False)['auth_token']
 
 
 class AllowedUseridView(BrowserView):
