@@ -95,21 +95,31 @@ app.service('AuthService', ['$rootScope', 'angularFire', '$q', '$cookieStore',
         $rootScope.isAdmin = false;
 
         // Fetch options. Currently only firebaseUrl is settable here.
-        $.getJSON($rootScope.staticRoot + 'options.json', function (data) {
+        $.getJSON('./options.json', function (data) {
             $rootScope.firebaseUrl = data.firebaseUrl;
             optionsQ.resolve();
         }).error(function () {
             throw new Error('Failed to fetch options.json');
         });
 
-        var userCredsCookie = $cookieStore.get('userCredentials'), userCreds;
+        var userCredsCookie = $cookieStore.get('userCredentials'),
+            userCreds;
         if (userCredsCookie) {
             userCreds = JSON.parse(userCredsCookie);
             $rootScope.serverId = userCreds.serverId;
             $rootScope.userId = userCreds.userId;
             $rootScope.fullName = userCreds.fullName;
+        } else {
+            var randUser = Math.floor(Math.random() * 101);
+            $rootScope.serverId = 'testserver';
+            $rootScope.userId = 'TestUser' + randUser;
+            $rootScope.fullName = 'Test User ' + randUser;
+            $cookieStore.put('userCredentials', JSON.stringify({
+                serverId: $rootScope.serverId,
+                userId: $rootScope.userId,
+                fullName: $rootScope.fullName
+            }));
         }
-
 
     } else {
         // Real mode.
@@ -117,7 +127,7 @@ app.service('AuthService', ['$rootScope', 'angularFire', '$q', '$cookieStore',
         optionsQ.resolve();
     }
 
-    $rootScope.defaultPortrait = $rootScope.staticRoot + 'defaultPortrait.png';
+    $rootScope.defaultPortrait = $rootScope.staticRoot + '/defaultPortrait.png';
     // Make user username and server id only contains good characters.
     var regExp = new RegExp('[a-zA-Z0-9.-_]+$');
     if ($rootScope.serverId.search(regExp) !== 0 || $rootScope.userId.search(regExp) !== 0) {
@@ -140,7 +150,7 @@ app.service('AuthService', ['$rootScope', 'angularFire', '$q', '$cookieStore',
 
     readyToAuth.then(function () {
         var firebase = $rootScope.fireBase;
-        var userCredsString =  $rootScope.serverId + ':' + $rootScope.userId + 
+        var userCredsString =  $rootScope.serverId + ':' + $rootScope.userId +
             ($rootScope.fullName ? ' (' + $rootScope.fullName + ')' : '');
 
         // Authenticate me.
@@ -237,15 +247,15 @@ app.controller('CommandCentralController',
         $scope.changeUser = function () {
             // Make user username and server id only contains good characters.
             var regExp = new RegExp('[a-zA-Z0-9.-_]+$');
-            if ($scope.serverId.search(regExp) === 0 && $scope.userId.search(regExp) === 0) {
+            if ($scope.serverId.search(regExp) !== 0 || $scope.userId.search(regExp) !== 0) {
                 throw new Error('Server id and user id may only contain alphanumeric and _ - ');
             }
             // Specify sensible defaults, with randomized  usernames.
             var randUser = Math.floor(Math.random() * 101);
             $cookieStore.put('userCredentials', JSON.stringify({
                 serverId: $scope.serverId || 'testserver',
-                userId: $scope.userId || 'TestUser' + randuser,
-                fullName: $scope.fullName || 'Test User ' + randuser
+                userId: $scope.userId || 'TestUser' + randUser,
+                fullName: $scope.fullName || 'Test User ' + randUser
             }));
             // Reload page to log in with newly set user.
             location.reload();

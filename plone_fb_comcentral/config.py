@@ -39,15 +39,18 @@ def get_config():
         config = {
             'firebase_url': props.getProperty('firebase_url', ''),
             'firebase_secret': props.getProperty('firebase_secret', ''),
-            'server_id': props.getProperty('server_id', 'plone'),
+            'server_id': props.getProperty('server_id', ''),
         }
     else:
         config = {
             'firebase_url': '',
             'firebase_secret': '',
-            'server_id': 'plone',
+            'server_id': '',
         }
     for key, value in get_env_config().iteritems():
         if not config[key]:
             config[key] = value
+    # server id must have some default
+    if config['server_id'] == '':
+        config['server_id'] = 'plone'
     return config

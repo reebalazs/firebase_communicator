@@ -21,11 +21,17 @@ def get_user_data(context, request):
     member = portal_state.member()
     user_id = member.getId()
     full_name = member.getProperty('fullname')
-    member_image = member.getPersonalPortrait()
-    portrait_url = member_image.absolute_url()
-    if portrait_url.endswith('/defaultUser.png'):
+    try:
+        method = member.getPersonalPortrait
+    except AttributeError:
         # default portrait: return empty string, meaning no portrait.
         portrait_url = ''
+    else:
+        member_image = method()
+        portrait_url = member_image.absolute_url()
+        if portrait_url.endswith('/defaultUser.png'):
+            # default portrait: return empty string, meaning no portrait.
+            portrait_url = ''
 
     # XXX TODO set this based on permission
     is_admin = user_id == 'admin'
