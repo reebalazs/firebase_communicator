@@ -21,6 +21,7 @@ def get_env_config():
     return {
         'firebase_url': os.getenv('PLONE_MESSAGING_URL', ''),
         'firebase_secret': os.getenv('PLONE_MESSAGING_SECRET', ''),
+        'server_id': os.getenv('PLONE_SERVER_ID', ''),
     }
 
 
@@ -29,8 +30,8 @@ def get_config():
 
     Data comes from the plone site properties.
 
-    If a given property is not found, then a
-    PLONE_MESSAGING_XXX environment variable is sourced.
+    If a given property is not found, then an
+    environment variable is sourced.
 
     """
     props = get_properties()
@@ -38,11 +39,13 @@ def get_config():
         config = {
             'firebase_url': props.getProperty('firebase_url', ''),
             'firebase_secret': props.getProperty('firebase_secret', ''),
+            'server_id': props.getProperty('server_id', 'plone'),
         }
     else:
         config = {
             'firebase_url': '',
             'firebase_secret': '',
+            'server_id': 'plone',
         }
     for key, value in get_env_config().iteritems():
         if not config[key]:

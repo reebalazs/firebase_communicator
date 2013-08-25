@@ -13,19 +13,25 @@ from .config import (
 
 
 def get_user_data(context, request):
-    """Return a {'plone_userid':..., 'fullname': ...} dictionary
-    plone_userid is None (if anon),
+    """Return a {'user_id':..., 'full_name': ..., portrait_url: ...} dictionary
+    user_id is None (if anon),
 
     or (XXX currently disabled) False,
     if the user is not allowed to use this feature.
     """
     portal_state = getMultiAdapter((context, request), name="plone_portal_state")
     member = portal_state.member()
-    plone_userid = member.getId()
-    fullname = member.getProperty('fullname')
+    user_id = member.getId()
+    full_name = member.getProperty('fullname')
+    member_image = member.getPersonalPortrait()
+    portrait_url = member_image.absolute_url()
+    if portrait_url.endswith('/defaultUser.png'):
+        # default portrait: return empty string, meaning no portrait.
+        portrait_url = ''
     return dict(
-        plone_userid=plone_userid,
-        fullname=fullname,
+        user_id=user_id,
+        full_name=full_name,
+        portrait_url=portrait_url,
     )
 
     # XXX XXX filter_users is currently not used.
@@ -35,14 +41,15 @@ def get_user_data(context, request):
     #
     #if props is not None and \
     #        props.getProperty('filter_users', False) and \
-    #        plone_userid not in props.getProperty('allowed_users', ()):
+    #        user_id not in props.getProperty('allowed_users', ()):
     #    # User is not allowed.
     #    return False
     #else:
-    #    return plone_userid
+    #    return user_id
+
 
 def get_allowed_userid(context, request):
-    return get_user_data(context, request)['plone_userid']
+    return get_user_data(context, request)['user_id']
 
 
 def get_auth_info(context, request, admin=False):
@@ -50,24 +57,26 @@ def get_auth_info(context, request, admin=False):
         user_data = get_user_data(context, request)
     else:
         user_data = dict(
-            plone_userid='admin',
-            fullname='',
+            user_id='admin',
+            full_name='',
+            portrait_url='',
         )
 
     custom_data = {
-        'ploneUserid': user_data['plone_userid'],
-        'ploneFullName': user_data['fullname'],
+        'user_id': user_data['user_id'],
+        'full_name': user_data['full_name'],
+        'portrait_url': user_data['portrait_url'],
     }
     options = {
         'admin': admin,
     }
     config = get_config()
 
-    if user_data['plone_userid'] is not None and user_data['plone_userid'] is not False:
+    if user_data['user_id'] is not None and user_data['user_id'] is not False:
         token = create_token(config['firebase_secret'], custom_data, options)
     else:
-        # If the user is not allowed, (plone_userid is None) return a void token.
-        # If the user is anonymous (not logged in), (plone_userid is False) we do not
+        # If the user is not allowed, (user_id is None) return a void token.
+        # If the user is anonymous (not logged in), (user_id is False) we do not
         # allow it either. Return a void token.
         token = ''
 
@@ -75,8 +84,7 @@ def get_auth_info(context, request, admin=False):
     portal_state = getMultiAdapter((context, request), name="plone_portal_state")
     portal_url = portal_state.portal_url()
     static = {
-        'staticRoot':  portal_url + '/++resource++fb_comcentral/',
-        'portraitRoot':  portal_url + '/portal_memberdata/portraits/',
+        'root':  portal_url + '/++resource++fb_comcentral/',
     }
 
     return dict(

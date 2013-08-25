@@ -67,12 +67,11 @@ app.config(['$routeProvider', '$locationProvider', '$provide',
         .otherwise({redirectTo: '/'});
 }]);
 
-app.service('AuthService', ['$rootScope', 'angularFire', '$q', '$cookieStore', 'setupUser',
-    function ($rootScope, angularFire, $q, $cookieStore, setupUser) {
-    // Configure parameters. In Plone these are provided from the template by ng-init.
+app.service('AuthService', ['$rootScope', 'angularFire', '$q', '$cookieStore',
+    function ($rootScope, angularFire, $q, $cookieStore) {
+    // Configure parameters. These are provided from the template by ng-init.
 
-    var credsQ = $q.defer(),
-        optionsQ = $q.defer(),
+    var optionsQ = $q.defer(),
         serverTimeOffsetQ = $q.defer(),
         authQ = $q.defer(),    // XX Not sure if we need to Q for auth.
         userProfileQ = $q.defer();
@@ -81,24 +80,20 @@ app.service('AuthService', ['$rootScope', 'angularFire', '$q', '$cookieStore', '
     this.promise = $q.all([
         authQ.promise, // XXX not sure if needed, and if not then whether it causes trouble
         serverTimeOffsetQ.promise,
-        credsQ.promise,
         optionsQ.promise,
         userProfileQ.promise // not using userProfilePromise for simplicity
     ]);
 
-    var staticRoot = $('meta[name="fb-comcentral-static"]').attr('content') || '../static/';
-    $rootScope.defaultPortrait = staticRoot + 'defaultPortrait.png';
-    //console.log('Portraits:', $rootScope.portraitRoot, $rootScope.defaultPortrait);
+    // If firebaseUrl is not set via ng-init, it means that we are in testing (static) mode.
+    $rootScope.testingMode = ($rootScope.firebaseUrl === undefined);
 
-    if (!$rootScope.firebaseUrl) {
+    if ($rootScope.testingMode) {
         // We are in the static html. Let's provide
         // constants for testing.
-
-        $rootScope.testingMode = true;
+        $rootScope.staticRoot = '../static';
         $rootScope.authToken = '';
-        $rootScope.staticRoot = '../static/';
-        $rootScope.portraitRoot = './PORTRAITS_FIXME/';   // TODO XXX set this to the static portrait root
 
+        // Fetch options. Currently only firebaseUrl is settable here.
         $.getJSON($rootScope.staticRoot + 'options.json', function (data) {
             $rootScope.firebaseUrl = data.firebaseUrl;
             optionsQ.resolve();
@@ -109,24 +104,24 @@ app.service('AuthService', ['$rootScope', 'angularFire', '$q', '$cookieStore', '
         var userCredsCookie = $cookieStore.get('userCredentials'), userCreds;
         if (userCredsCookie) {
             userCreds = JSON.parse(userCredsCookie);
+            $rootScope.serverId = userCreds.serverId;
+            $rootScope.userId = userCreds.userId;
+            $rootScope.fullName = userCreds.fullName;
         }
 
-        if (userCreds && userCreds.serverId && userCreds.userId && userCreds.fullName) {
-            setupUser(userCreds.serverId, userCreds.userId, userCreds.fullName, false);
-        }
-        else {
-            var randUser = Math.floor(Math.random() * 101); // Vary userId to make testing easier
-            setupUser('TestingServer', 'TestUser' + randUser, 'Test User ' + randUser, true);
-        }
-        credsQ.resolve();
-    }
-    else {
+    } else {
+
+        // Real mode.
         optionsQ.resolve();
-        credsQ.resolve();
-        if (!$rootScope.fullName) {
-            // if empty full name, substitute with username --- Why?? current code will just not show it
-            $rootScope.fullName = $rootScope.userId; 
-        }
+        $rootScope.staticRoot = $('meta[name="fb-comcentral-static"]').attr('content');
+
+    }
+
+    $rootScope.defaultPortrait = staticRoot + 'defaultPortrait.png';
+    // Make user username and server id only contains good characters.
+    var regExp = new RegExp('[a-zA-Z0-9.-_]+$');
+    if ($rootScope.serverId.search(regExp) === 0 && $rootScope.userId.search(regExp) === 0) {
+        throw new Error('Server id and user id may only contain alphanumeric and _ - ');
     }
 
     optionsQ.promise.then(function () {
@@ -140,7 +135,6 @@ app.service('AuthService', ['$rootScope', 'angularFire', '$q', '$cookieStore', '
     });
 
     var readyToAuth = $q.all([
-        credsQ.promise,
         optionsQ.promise
     ]);
 
@@ -232,19 +226,29 @@ app.service('StreamService', ['$rootScope', 'AuthService', function ($rootScope,
 }]);
 
 app.controller('CommandCentralController',
-    ['$scope', '$rootScope', '$cookieStore', 'setupUser',
-    function ($scope, $rootScope, $cookieStore, setupUser) {
+    ['$scope', '$rootScope', '$cookieStore',
+    function ($scope, $rootScope, $cookieStore) {
 
-        with ($rootScope) {
-            $scope.testingMode = testingMode;
-            $scope.userId = userId;
-            $scope.serverId = serverId;
-            $scope.fullName = fullName;
-        }
-        
+        $scope.testingMode = $rootScope.testingMode;
+        $scope.userId = $rootScope.userId;
+        $scope.serverId = $rootScope.serverId;
+        $scope.fullName = $rootScope.fullName;
+
         $scope.changeUser = function () {
-            setupUser($scope.serverId, $scope.userId, $scope.fullName, true);
-            location.reload(); //Simple in order to not bother with refreshing all data and changing the connection details
+            // Make user username and server id only contains good characters.
+            var regExp = new RegExp('[a-zA-Z0-9.-_]+$');
+            if ($scope.serverId.search(regExp) === 0 && $scope.userId.search(regExp) === 0) {
+                throw new Error('Server id and user id may only contain alphanumeric and _ - ');
+            }
+            // Specify sensible defaults, with randomized  usernames.
+            var randUser = Math.floor(Math.random() * 101);
+            $cookieStore.put('userCredentials', JSON.stringify({
+                serverId: $scope.serverId || 'testserver',
+                userId: $scope.userId || 'TestUser' + randuser,
+                fullName: $scope.fullName || 'Test User ' + randuser
+            }));
+            // Reload page to log in with newly set user.
+            location.reload();
         };
 }]);
 
@@ -595,27 +599,6 @@ app.directive('contenteditable', ['parseBBCode', function (parseBBCode) {
     };
 }]);
 
-app.factory('setupUser', ['$cookieStore', '$rootScope', function ($cookieStore, $rootScope) {
-    return function (serverId, userId, fullName, setCookie) {
-        var regExp = new RegExp('[a-zA-Z0-9.-_]+$');
-        if (serverId.search(regExp) === 0 && userId.search(regExp) === 0) {
-            $rootScope.serverId = serverId;
-            $rootScope.userId = userId;
-            $rootScope.fullName = fullName;
-
-            if (setCookie) {
-                $cookieStore.put('userCredentials', JSON.stringify({
-                    serverId: serverId,
-                    userId: userId,
-                    fullName: fullName
-                }));
-            }
-        }
-        else {
-            throw new Error('Invalid User Credentials');
-        }
-    };
-}]);
 
 app.factory('handleCommand', ['createPrivateRoom', '$rootScope', function (createPrivateRoom, $rootScope) {
     return function (msg, messages, username, users, helpMessage) {

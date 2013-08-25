@@ -1,5 +1,5 @@
 
-# plone_fb_comcentral #
+# plone_fb_communicator #
 
 A messaging application to demonstrate interactivity brought to Plone via the technologies of [AngularJS](http://angularjs.org) and [FireBase](http://firebase.com).
 
@@ -8,7 +8,7 @@ A messaging application to demonstrate interactivity brought to Plone via the te
 
 The package can be installed in the same way as Plone packages are usually installed.
 
-After the installation, the `plone_fb_comcentral` package has to be installed from `Site Setup / Add Packages`.
+After the installation, the `plone_fb_communicator` package has to be installed from `Site Setup / Add Packages`.
 
 
 ### Buildout example ###
@@ -55,12 +55,26 @@ Keep the secret confidential, because if you give this secret to anyone, you gra
 If this property is left empty, the value of the `PLONE_FIREBASE_SECRET` environment variable will be used as a default.
 
 
+#### server_id
+
+In a multi-server clustered environment, this identifies the current Plone server. The user ids are unique within one server, but each server can have their own user space.
+
+If this property is left empty, the value of the `PLONE_SERVER_ID` environment variable will be used as a default.
+
+If none of the above is specified, the default value will be 'plone'.
+
+If this is the only server connectiong to the same Firebase, the server id can be left empty.
+
+
+
 ### Alternate way: customize via enviromnent variables ###
 
-As mentioned above, the `firebase_url` and `firebase_secret` properties can also be specified from environment variables:
+As mentioned above, the `firebase_url`, `firebase_secret`
+and `server_id` properties can also be specified from environment variables:
 
     % export PLONE_FIREBASE_URL='https://my-firebase.firebaseio.com/...'
     % export PLONE_FIREBASE_SECRET='ZsAjg**********...'
+    % export PLONE_SERVER_ID='TestServer...'
 
 If these values exist, they serve as a default value and the property fields in site_properties can be left empty. If the properties are also specified, they will take precedence over the environment variables.
 

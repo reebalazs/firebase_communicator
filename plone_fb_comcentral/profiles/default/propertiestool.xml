@@ -4,6 +4,7 @@
   <property name="title">Firebase Com Central properties</property>
   <property name="firebase_url" type="string"></property>
   <property name="firebase_secret" type="string"></property>
+  <property name="server_id" type="string"></property>
   <!--property name="filter_users" type="boolean">False</property>
   <property name="allowed_users" type="lines"/-->
  </object>
