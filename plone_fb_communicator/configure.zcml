@@ -20,12 +20,12 @@
        />
 
     <browser:resourceDirectory
-        name="fb_comcentral"
+        name="fb_communicator"
         directory="static"
         />
 
     <browser:viewlet
-        name="fb_comcentral.head"
+        name="fb_communicator.head"
         class=".viewlet.FirebaseViewlet"
         manager="plone.app.layout.viewlets.interfaces.IHtmlHead"
         template="templates/head.pt"
@@ -34,7 +34,7 @@
         />
 
     <browser:viewlet
-        name="fb_comcentral.central"
+        name="fb_communicator.central"
         class=".viewlet.FirebaseViewlet"
         manager="plone.app.layout.viewlets.interfaces.IPortalHeader"
         template="templates/central.pt"
@@ -51,7 +51,7 @@
     <browser:page
         for="*"
         class=".auth.AllowedUseridView"
-        name="fb_comcentral_allowed_userid"
+        name="fb_communicator_allowed_userid"
         permission="zope.Public"
       />
 
@@ -59,7 +59,7 @@
    <browser:page
         for="*"
         class=".activity.SimulateActivity"
-        name="fb_comcentral_simulate_activity"
+        name="fb_communicator_simulate_activity"
         permission="zope.Public"
       />
 

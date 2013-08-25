@@ -97,7 +97,7 @@ def get_auth_info(context, request, force_admin=False):
     portal_state = getMultiAdapter((context, request), name="plone_portal_state")
     portal_url = portal_state.portal_url()
     static = {
-        'root':  portal_url + '/++resource++fb_comcentral/',
+        'root':  portal_url + '/++resource++fb_communicator/',
     }
 
     return dict(

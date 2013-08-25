@@ -9,7 +9,7 @@ app.config(['$routeProvider', '$locationProvider', '$provide',
     // XXX with ng-init. So, staticRoot comes in another way, and
     // the rest is configured not from config, but from authService.
     //
-    var staticRoot = $('meta[name="fb-comcentral-static"]').attr('content') || '../static/';
+    var staticRoot = $('meta[name="fb-communicator-static"]').attr('content') || '../static/';
 
     $locationProvider
       .html5Mode(false)
@@ -24,7 +24,7 @@ app.config(['$routeProvider', '$locationProvider', '$provide',
 
     $routeProvider
 
-        .when('/', {templateUrl: staticRoot + 'partials/fb_comcentral.html',
+        .when('/', {templateUrl: staticRoot + 'partials/fb_communicator.html',
             controller: 'CommandCentralController',
             resolve: {auth: authResolve}
         })
@@ -361,7 +361,7 @@ app.controller('SimulateActivityController',
         $scope.save = function () {
             $http({
                 method: 'GET',
-                url: fbMessagingHereUrl + '/fb_comcentral_simulate_activity',
+                url: fbMessagingHereUrl + '/fb_simulate_activity',
                 params: {
                     message: $scope.activity.message,
                     description: $scope.activity.description,

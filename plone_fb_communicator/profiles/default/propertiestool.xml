@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <object name="portal_properties" meta_type="Plone Properties Tool">
- <object name="firebase_comcentral_properties" meta_type="Plone Property Sheet">
-  <property name="title">Firebase Com Central properties</property>
+ <object name="firebase_communicator_properties" meta_type="Plone Property Sheet">
+  <property name="title">Firebase Communicator properties</property>
   <property name="firebase_url" type="string"></property>
   <property name="firebase_secret" type="string"></property>
   <property name="server_id" type="string"></property>
