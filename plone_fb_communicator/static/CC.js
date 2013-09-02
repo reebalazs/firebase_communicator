@@ -123,6 +123,15 @@ app.service('AuthService', ['$rootScope', 'angularFire', '$q', '$cookieStore',
 
     } else {
         // Real mode.
+        // Check for mandatory parameters.
+        $.each(['staticRoot', 'authToken', 'isAdmin',
+            'serverId', 'userId', 'fullName', 'portraitUrl'], function(i, key) {
+            if ($rootScope[key] === undefined) {
+                throw new Error('Error in FireBase configuration: missing ng-init "' +
+                    key + '"');
+            }
+        });
+        // Convert isAdmin to boolean.
         $rootScope.isAdmin = $rootScope.isAdmin == 'true' || $rootScope.isAdmin == 'True';
         optionsQ.resolve();
     }
