@@ -1,11 +1,14 @@
 {
-    "name": "plone_fb_communicator",
-    "version": "0.1.0",
-    "dependencies": {
-        "jquery": "*",
-        "angular": "*",
-        "angular-cookies": "*",
-        "angularFire": "https://github.com/firebase/angularFire.git",
-        "angular-elastic": "*"
-    }
+  "name": "plone_fb_communicator",
+  "version": "0.1.0",
+  "dependencies": {
+    "jquery": "*",
+    "angular": ">= 1.0.8",
+    "angular-cookies": "*",
+    "angularFire": "https://github.com/firebase/angularFire.git",
+    "angular-elastic": "*"
+  },
+  "resolutions": {
+    "angular": ">= 1.0.8"
+  }
 }

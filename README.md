@@ -41,7 +41,7 @@ For example:
 
 You can use the same firebase for more applications. You can specify an arbitrary path prefix to your database which at this point does not need to exist yet, but it is important that the url designates a path in the database that does not overlap with your other applications:
 
-    https://my-firebase.firebaseio.com/COMPANY/PROJECT/SITE/com_central
+    https://my-firebase.firebaseio.com/COMPANY/PROJECT/SITE/communicator
 
 If this property is left empty, the value of the `PLONE_FIREBASE_URL` environment variable will be used as a default.
 
@@ -106,7 +106,7 @@ There is no need to create any data in Firebase as the data will be created on t
 
 ## Using the UI from Plone ##
 
-Open 'Com Central' from the Plone user menu to access the UI.
+Open 'Communicator' from the Plone user menu to access the UI.
 
 XXX
 

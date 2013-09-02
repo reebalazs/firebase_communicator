@@ -13,9 +13,9 @@
 
     <genericsetup:registerProfile
        name="default"
-       title="Plone Firebase Com Central"
+       title="Plone Firebase Communicator"
        directory="profiles/default"
-       description="Plone Firebase Com Central"
+       description="Plone Firebase Communicator"
        provides="Products.GenericSetup.interfaces.EXTENSION"
        />
 
