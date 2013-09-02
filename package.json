@@ -1,5 +1,5 @@
 {
-    "name": "plone_fb_communicator",
+    "name": "firebase_communicator",
     "version": "0.1.0",
     "devDependencies": {
         "yo": "*",

@@ -9,7 +9,7 @@ module.exports = function(grunt) {
     copy: {
       'default': {
         files: {
-          'plone_fb_comcentral/static/dist/': [
+          'app/dist/': [
             collect.bower('jquery').path('jquery.js'),
             collect.bower('angular').path('angular.js'),
             collect.bower('angular-cookies').path('angular-cookies.js'),
@@ -22,16 +22,16 @@ module.exports = function(grunt) {
     uglify: {
       'default': {
         files: {
-          'plone_fb_comcentral/static/dist/angular.min.js': [
+          'app/dist/angular.min.js': [
             collect.bower('angular').path('angular.js')
           ],
-          'plone_fb_comcentral/static/dist/angular-cookies.min.js': [
+          'app/dist/angular-cookies.min.js': [
             collect.bower('angular-cookies').path('angular-cookies.js')
           ],
-          'plone_fb_comcentral/static/dist/angular-elastic.min.js': [
+          'app/dist/angular-elastic.min.js': [
               collect.bower('angular-elastic').path('elastic.js')
           ],
-          'plone_fb_comcentral/static/dist/jquery.min.js': [
+          'app/dist/jquery.min.js': [
             collect.bower('jquery').path('jquery.js')
           ]
 

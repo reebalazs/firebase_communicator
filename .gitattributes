@@ -1,1 +1,1 @@
-plone_fb_communicator/static/dist/** -diff
+app/dist/** -diff
